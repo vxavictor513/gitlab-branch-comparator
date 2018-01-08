@@ -18,8 +18,8 @@ Configure `config.ini`.
 * `url` (string): The URL of the GitLab server
 * `email` (string): The user email or login
 * `password` (str) – The user password (associated with email/login)
-* `http_username` (string): Username for HTTP authentication.
-* `http_password` (string): Password for HTTP authentication
+* `http_username` (string): Username for Basic HTTP authentication.
+* `http_password` (string): Password for Basic HTTP authentication
 * `projects` (string[]): Comma-separated list of project names
 ```
 [GitLab]
