@@ -35,7 +35,7 @@ def printCommit(commit, index):
     title = commit['title']
     author = commit['author_name']
     createdAt = commit['created_at']
-    print("{}\t{}".format(index, title.encode('utf-8')))
+    print("{}\t{}".format(index, title))
     print("\t>> created by {} at {}\n".format(author, createdAt))
 
 def main():
