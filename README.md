@@ -35,8 +35,8 @@ projects = project-A,project-B
 ```
 $ python3 compare.py [-m:f:a] [--only-commits]
 
--m --master-branch      Master branch name
--f --feature-branch     Feature branch name
+-m --master-branch      Master branch name | default: 'master'
+-f --feature-branch     Feature branch name | default: 'development'
 -a --show-all           Show both summary and unmerged commit details
 --only-commits          Only show the unmerged commit details
 ```
