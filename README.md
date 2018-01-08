@@ -49,8 +49,8 @@ $ python3 compare.py -m master -f development
 Comparing from 'master' (master) to 'development' (feature)
 
 RESULTS: 2 project(s) have unmerged changes:
-* 3     'project-A'
-* 1     'project-B'
+* 3 change(s)   'project-A'
+* 1 change(s)   'project-B'
 
 ```
 

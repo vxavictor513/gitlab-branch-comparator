@@ -94,7 +94,7 @@ def main():
         print("RESULTS: {} project(s) have unmerged changes:".format(len(unmergedProjects)))
         pList = ''
         for p in unmergedProjects:
-            print("* {}\t'{}'".format(unmergedProjects[p], p))
+            print("* {} change(s)\t'{}'".format(unmergedProjects[p], p))
         print("")
 
 if __name__ == "__main__":
