@@ -44,11 +44,33 @@ $ python3 compare.py [-m:f:a] [--only-commits]
 
 ### Sample Results
 ```
+$ python3 compare.py -m master -f development
 
 Comparing from 'master' (master) to 'development' (feature)
 
 RESULTS: 2 project(s) have unmerged changes:
 * 3     'project-A'
-* 5     'project-B'
+* 1     'project-B'
+
+```
+
+```
+$ python3 compare.py -m master -f development --only-commits
+
+Comparing from 'master' (master) to 'development' (feature)
+
+Unmerged commit(s) for 'project-A'
+1       Updated pom.xml
+        >> created by dev-012 at 2017-11-09T11:45:40.000+00:00
+
+2       Added feature YY
+        >> created by dev-012 at 2017-11-10T17:04:25.000+00:00
+
+3       Merge branch 'feature-YY' into 'development'
+        >> created by dev-007 at 2017-12-04T11:27:32.000+00:00
+
+Unmerged commit(s) for 'project-B'
+1       Added feature X
+        >> created by dev-007 at 2017-11-09T11:45:40.000+00:00
 
 ```
