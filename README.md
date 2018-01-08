@@ -39,4 +39,16 @@ $ python3 compare.py [-m:f:a] [--only-commits]
 -f --feature-branch     Feature branch name | default: 'development'
 -a --show-all           Show both summary and unmerged commit details | default: False
 --only-commits          Only show the unmerged commit details | default: False
+-d --debug              Enable debug mode
+```
+
+### Sample Results
+```
+
+Comparing from 'master' (master) to 'development' (feature)
+
+RESULTS: 2 project(s) have unmerged changes:
+* 3     'project-A'
+* 5     'project-B'
+
 ```
