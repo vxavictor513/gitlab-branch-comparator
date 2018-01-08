@@ -33,7 +33,7 @@ projects = project-A,project-B
 
 ### Usage
 ```
-$ python3 compare.py [-m:f:a] [--only-commits]
+$ python3 compare.py [-m:f:ad] [--master-branch --feature-branch --show-all --only-commits --debug]
 
 -m --master-branch      Master branch name | default: 'master'
 -f --feature-branch     Feature branch name | default: 'development'
