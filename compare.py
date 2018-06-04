@@ -1,5 +1,5 @@
 import sys, getopt
-from configparser import RawConfigParser
+from configparser import RawConfigParser, NoOptionError
 import gitlab
 
 def getSettings():
@@ -47,6 +47,11 @@ def main():
     config = RawConfigParser()
     config.read('config.ini')
 
+    # Read settings
+    MASTER_BRANCH, FEATURE_BRANCH, ONLY_COMMITS, SHOW_ALL, IS_DEBUG = getSettings()
+    print("\nComparing from '{}' (master) to '{}' (feature)".format(MASTER_BRANCH, FEATURE_BRANCH))
+
+    # Login GitLab
     httpUsername=None
     httpPassword=None
     if (config.has_option('GitLab', 'http_username') and config.has_option('GitLab', 'http_password')):
@@ -55,46 +60,74 @@ def main():
 
     gl = gitlab.Gitlab(
         url=config.get('GitLab', 'url'),
-        email=config.get('GitLab', 'email'),
-        password=config.get('GitLab', 'password'),
         http_username=httpUsername,
-        http_password=httpPassword
+        http_password=httpPassword,
+        private_token=config.get('GitLab', 'private_token')
     )
     gl.auth()
 
-    projectNames = config['GitLab']['projects'].split(',')
-    if len(projectNames) == 1 and projectNames[0] is '':
-        print("Please configure list of projects in config.ini file.\n")
-        return
+    # Get Projects
+    targetGroups = config.get('GitLab','project_group').split(',')
 
-    MASTER_BRANCH, FEATURE_BRANCH, ONLY_COMMITS, SHOW_ALL, IS_DEBUG = getSettings()
-    print("\nComparing from '{}' (master) to '{}' (feature)".format(MASTER_BRANCH, FEATURE_BRANCH))
-    unmergedProjects = {}
-    for item in projectNames:
-        ms = item.strip()
-        projects = gl.projects.list(search=ms)
-        project = getProject(projects, ms)
-        if project is not None:
-            result = project.repository_compare(MASTER_BRANCH, FEATURE_BRANCH)
-            numberOfUnmergedCommits = len(result['commits'])
-            if IS_DEBUG and ((not ONLY_COMMITS) or SHOW_ALL):
-                print("'{}' project has {} unmerged commit(s).".format(ms, numberOfUnmergedCommits))
-            if numberOfUnmergedCommits > 0:
-                unmergedProjects.update({ms: numberOfUnmergedCommits})
-            if (ONLY_COMMITS or SHOW_ALL) and result['commits']:
-                i = 1
-                print("\nUnmerged commit(s) for '{}'".format(ms))
-                for commit in result['commits']:
-                    printCommit(commit, i)
-                    i += 1
+    for targetGroup in targetGroups:
+        groupName = targetGroup
+        group = gl.groups.get(groupName)
+        print("\n////////////////////////////////////////")
+        print("Accessing group: {}".format(groupName))
+        print("////////////////////////////////////////")
+
+        try:
+            includedProjects = config.get('project.' + groupName,'included_projects').split(',')
+        except NoOptionError:
+            includedProjects = []
+
+        if not len(includedProjects) == 0:
+            print('\nAssessing projects:\n{}\n'.format(','.join(includedProjects)))
+            projectNames = includedProjects
         else:
-            print("\n'{}' project is not found!".format(ms))
-    print("")
-    if unmergedProjects and not ONLY_COMMITS:
-        print("RESULTS: {} project(s) have unmerged changes:".format(len(unmergedProjects)))
-        pList = ''
-        for p in unmergedProjects:
-            print("* {} change(s)\t'{}'".format(unmergedProjects[p], p))
+            try:
+                excludedProjects = config.get('project.' + groupName,'excluded_projects').split(',')
+            except NoOptionError:
+                excludedProjects = []
+            if not len(excludedProjects) == 0:
+                print("\nExcluded projects:\n{}".format(','.join(excludedProjects)))
+            projects = group.projects.list(all=True, order_by='name', sort='asc')
+            projectList = ''
+            for proj in projects:
+                if (proj.name not in excludedProjects):
+                    projectList += proj.name
+                    projectList += ','
+            projectList = projectList.rstrip(',')
+            print('\nAssessing projects:\n{}\n'.format(projectList))
+            projectNames = projectList.split(',')
+            
+        unmergedProjects = {}
+        for item in projectNames:
+            ms = item.strip()
+            projects = gl.projects.list(search=ms)
+            project = getProject(projects, ms)
+            if project is not None:
+                result = project.repository_compare(MASTER_BRANCH, FEATURE_BRANCH)
+                numberOfUnmergedCommits = len(result['commits'])
+                if IS_DEBUG and ((not ONLY_COMMITS) or SHOW_ALL):
+                    print("'{}' project has {} unmerged commit(s).".format(ms, numberOfUnmergedCommits))
+                if numberOfUnmergedCommits > 0:
+                    unmergedProjects.update({ms: numberOfUnmergedCommits})
+                if (ONLY_COMMITS or SHOW_ALL) and result['commits']:
+                    i = 1
+                    print("\nUnmerged commit(s) for '{}'".format(ms))
+                    for commit in result['commits']:
+                        printCommit(commit, i)
+                        i += 1
+            else:
+                print("\n'{}' project is not found!".format(ms))
+        print("")
+        if unmergedProjects and not ONLY_COMMITS:
+            print("RESULTS: {} project(s) have unmerged changes:".format(len(unmergedProjects)))
+            for p in unmergedProjects:
+                print("* {} change(s)\t'{}'".format(unmergedProjects[p], p))
+        elif not unmergedProjects:
+            print("RESULTS: No unmerged changes.")
         print("")
 
 if __name__ == "__main__":
