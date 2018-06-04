@@ -14,7 +14,7 @@ $ sudo pip3 install --upgrade python-gitlab
 ### GitLab Configuration
 Configure `config.ini`.
 
-## General Configuration: [GitLab]
+#### General Configuration: [GitLab]
 * `url` (string): The URL of the GitLab server
 * `http_username` (string): Username for Basic HTTP authentication
 * `http_password` (string): Password for Basic HTTP authentication
@@ -29,7 +29,7 @@ private_token = 8fuaiovn83wf9iwbvai
 project_group = group-a,group-b
 ```
 
-## Group Configuration: [group.group-a]
+#### Group Configuration: [group.group-a]
 _Note: Remember to add `group.` as prefix._
 * `included_project` (string[]): Comma-separated list of projects to be scanned.
 * `excluded_project` (string[]): Comma-separated list of projects to be excluded. Not effective if `included_project` is configured.
@@ -133,7 +133,7 @@ RESULTS: No unmerged changes.
 ```
 
 ### Changelog
-## v3 to v4
+#### v3 to v4
 * Upgraded to support GitLab v4 API. For GitLab v3 API, please use `v3` branch.
 * This version should support only GitLab version 10.2 or above, as the program no longer support login using email and password. Instead, please login using private token.
 * Added support to scan multiple groups.
